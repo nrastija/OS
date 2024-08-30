@@ -1,0 +1,85 @@
+Ljudožderi i misionari
+Zadatak
+
+Riješiti problem prijevoza ljudoždera (kanibala) i misionara. Na obali neke široke rijeke postoji čun (čamac) koji prevozi ljudoždere i misionare na drugu stranu obale. Kapacitet čuna je 7 putnika. U čunu moraju biti najmanje 3 putnika da on može krenuti. U čunu ne smije biti više ljudoždera od misionara, dok su sve ostale kombinacije putnika dopuštene. Ljudožderi i misionari dolaze sa obje strane rijeke. Jedan misionar dolazi svake dvije sekunde, a ljudožder svake sekunde (odabir obale je slučajan). Nakon što pređu preko rijeke putnici odlaze dalje (nema ih više u sustavu). U sustavu neka postoji samo jedan čun, a svaki misionar i ljudožder predstavljaju po jednu dretvu. Čun je također jedna dretva koja pri svakom prijelazu uz pomoć drugih dretava ispisuje koga prevozi (npr. "Prevezeni: misionar, ljudožder, misionar, misionar, \n"). Pretpostaviti da je čun u početku na desnoj obali. Nakon što se u čunu popune tri (ili više) mjesta, čun pričeka još sekundu i kreće preko rijeke što traje dvije sekunde. Dretve misionare i ljudoždere stvara pomoćna dretva. Ispravno sinkronizirati dretve ljudoždere, misionare i čun. Raditi s neimenovanim semaforima, ne imenovanima! Sleep je ovdje izvan kritičnoga odsječka iznimno dopušten, ali samo ondje gdje piše pričekati_sekundu!
+
+Skica mogućega rješenja:
+
+Varijable: (globalne)
+	broj[obala][vrsta_putnika] - koliko putnika čeka na ukrcavanje 
+		na pojedinoj obali, posebno ljudoždera, posebno misionara.
+	br_putnika - broj putnika u čunu
+	čun_obala - na kojoj je obali trenutno čun
+
+Dretva koja stvara putnike:
+
+dretva šuma(){
+	ponavljaj {
+		stvori_dretvu_ljudoždera(slučajan_odabir_obale)
+		pričekaj_sekundu
+		stvori_dretvu_misionara(slučajan_odabir_obale)
+		stvori_dretvu_ljudoždera(slučajan_odabir_obale)
+		pričekaj_sekundu
+	} do zauvijek
+}
+
+dretva misionar(obala){//ljudožder je vrlo sličan
+	IspitajBSem(K)//kritični odsječak
+
+	broj[obala][MISIONARI]++
+
+	dok (ne_uđeš_u_čun) {
+		ako (čun_na_ovoj_obali i ima_mjesta_u_čunu i
+			nema_više_ljudoždera_od_misionara i još_traje_ukrcavanje) {
+			uđi_u_čun
+			broj[obala][MISIONARI]--
+			br_putnika++
+
+			ako (br_putnika == 3) {
+				PostaviBSem(ukrcavanje)
+			}
+			ako (br_putnika >= 3 i br_putnika < 7 i 
+					broj[obala][LJUDOŽDERI] > 0) {
+				PostaviOSem(S[obala][LJUDOŽDERI])
+			}
+		}
+		inače {
+			PostaviBSem(K)
+			IspitajOSem(S[obala][MISIONARI])
+			IspitajBSem(K)
+		}
+	}
+	PostaviBSem(K)
+	IspitajOSem(čun)//čeka na iskrcavanje
+	IspitajBSem(K)
+	označi_svoje_iskrcavanje//ispiši sebe, zarez, razmak
+	br_putnika--
+	ako (br_putnika == 0) {
+		PostaviBSem(iskrcavanje)
+	}
+	PostaviBSem(K)
+}
+
+dretva čun(){
+	čun_obala=desna_obala
+
+	ponavljaj {
+		IspitajBSem(ukrcavanje)
+		pričekati_sekundu//potom završava ukrcavanje, ispiši "Prevezeni: "
+		čun_obala = druga_obala(čun_obala)
+
+		prijevoz_preko_rijeke//pričekaj dvije sekunde
+
+		za i=1 do br_putnika {//br_putnika se može promijeniti za izvođenja petlje!!!
+			PostaviOSem(čun)
+		}
+		IspitajBSem(iskrcavanje)//potom počinje ukrcavanje, ispiši "\n"
+
+		za i=1 do broj[čun_obala][MISIONARI] {
+			PostaviOSem(S[čun_obala][MISIONARI])
+		}
+		za i=1 do broj[čun_obala][LJUDOŽDERI] {
+			PostaviOSem(S[čun_obala][LJUDOŽDERI])
+		}
+	} do zauvijek
+}

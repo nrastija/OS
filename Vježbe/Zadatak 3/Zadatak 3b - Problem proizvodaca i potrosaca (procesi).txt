@@ -1,0 +1,83 @@
+Problem proizvođača i potrošača
+Zadatak
+
+Ostvariti komunikaciju među procesima koji se paralelno izvode porabom međuspremnika ograničene duljine. Program prima dva ulazna parametra preko komandne linije. Prvi parametar označava broj procesa proizvođača, a drugi parametar označava broj slučajnih brojeva koje svaki proizvođač mora generirati i staviti u međuspremnik. Potrošač prima broj po broj od proizvođača preko međuspremnika i računa njihov zbroj. Nakon što je primio sve brojeve od svih proizvođača i izračunao njihov zbroj, treba ispisati zbroj na zaslonu.
+
+Struktura rješenja
+
+Podatci zajednički za proizvođače i potrošače (smjestiti ih u dijeljeni spremnik):
+
+    cjelobrojne varijable ULAZ i IZLAZ, UKUPNO
+    međuspremnik M, polje od 5 mjesta
+    imenovani semafori PIŠI, PUN, PRAZAN (semget)
+
+Struktura procesa proizvođač:
+
+proces proizvođač
+   i = 0
+   čini
+      ispitaj_PUN
+      ispitaj_PIŠI
+      M[ULAZ] = slučajni broj
+      ULAZ = (ULAZ + 1) mod 5
+      postavi_PIŠI
+      postavi_PRAZAN
+      i = i + 1
+   do N // broj slučajnih brojeva
+kraj.
+
+Struktura procesa potrošač:
+
+proces potrošač
+   i = 0
+   zbroj = 0
+   čini
+      ispitaj_PRAZAN
+      zbroj += M[IZLAZ]
+      IZLAZ = (IZLAZ+1) mod 5
+      postavi_PUN
+      i = i+1
+   do UKUPNOg broja slučajnih brojeva
+   ispiši zbroj na zaslon
+kraj.
+
+Napomene
+
+Pripaziti na ispravnu inicijalizaciju semafora i varijable ULAZ i IZLAZ. 
+Primjer ispisa pokretanja programa
+
+
+lumilic@barka:~/3$ ./b.out 3 5
+Proizvodac 3 salje "516"
+Potrosac prima 516
+Proizvodac 2 salje "348"
+Potrosac prima 348
+Proizvodac 3 salje "978" 
+Potrosac prima 978
+Proizvodac 2 salje "347" 
+Potrosac prima 347
+Proizvodac 3 salje "531" 
+Potrosac prima 531
+Proizvodac 2 salje "769" 
+Proizvodac 3 salje "257" 
+Potrosac prima 769
+Potrosac prima 257
+Proizvodac 1 salje "977" 
+Proizvodac 2 salje "612" 
+Proizvodac 3 salje "516" 
+Proizvodac 3 zavrsio sa slanjem
+Potrosac prima 977
+Potrosac prima 612
+Potrosac prima 516
+Proizvodac 1 salje "981" 
+Proizvodac 2 salje "4" 
+Proizvodac 2 zavrsio sa slanjem
+Potrosac prima 981
+Potrosac prima 4
+Proizvodac 1 salje "519" 
+Proizvodac 1 salje "220" 
+Potrosac prima 519
+Proizvodac 1 salje "758" 
+Potrosac prima 220
+Potrosac - zbroj primljenih brojeva=7575
+Proizvodac 1 zavrsio sa slanjem
