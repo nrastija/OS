@@ -1,0 +1,70 @@
+Dekkerov postupak međusobnoga isključivanja
+Napomena: zadatak ostvariti rabeći dretve
+ 
+Zadatak
+
+Ostvariti sustav usporednih procesa/dretava. Građa procesa/dretava dana je sljedećim pseudokodom:
+
+proces proc(i)          /* i  [0..n-1] */ {
+   za k = 1 do 5 čini {
+      uđi u kritični odsječak
+      za m = 1 do 5 čini {
+          ispiši(i, k, m)
+      }
+      iziđi iz kritičnoga odsječka
+   }
+}
+
+Međusobno isključivanje ostvariti za dva procesa/dretve međusobnim isključivanjem po Dekkerovu algoritmu.
+Dekkerov algoritam:
+
+zajedničke varijable: PRAVO, ZASTAVICA[0..1]
+ 
+funkcija uđi_u_kritični_odsječak(i, j) {
+   ZASTAVICA[i] = 1
+   dok ZASTAVICA[j] <> 0 čini {
+      ako PRAVO == j onda {
+         ZASTAVICA[i] = 0
+         dok PRAVO == j čini {
+            ništa
+         }
+         ZASTAVICA[i] = 1
+      }
+   }
+}
+ 
+funkcija iziđi_iz_kritičnoga_odsječka(i, j) {
+   PRAVO = j
+   ZASTAVICA[i] = 0
+}
+
+Upute:
+
+Ako se program rješava s procesima, tad treba zajedničke varijable tako ustrojiti da se prostor za nje zauzme u jedan put i podijeli među njima. Ovo je ključno zbog ograničenoga broja segmenata i velikoga broja korisnika.
+
+Ovisno o opterećenosti računala i broju procesa koji se pokreću, a da bi se vidjele razlike prigodom izvođenja programa, može zatrebati usporiti izvršavanje pozivom:
+
+sleep(1);
+
+nakon: ispiši(i, k, m).
+Primjer ispisa:
+
+lumilic@barka:~/2$ ./c.out
+Dretva: 1, K.O. br: 1 (1/5)
+Dretva: 1, K.O. br: 1 (2/5)
+Dretva: 1, K.O. br: 1 (3/5)
+Dretva: 1, K.O. br: 1 (4/5)
+Dretva: 1, K.O. br: 1 (5/5)
+Dretva: 2, K.O. br: 1 (1/5)
+Dretva: 2, K.O. br: 1 (2/5)
+Dretva: 2, K.O. br: 1 (3/5)
+Dretva: 2, K.O. br: 1 (4/5)
+Dretva: 2, K.O. br: 1 (5/5)
+Dretva: 1, K.O. br: 2 (1/5)
+Dretva: 1, K.O. br: 2 (2/5)
+Dretva: 1, K.O. br: 2 (3/5)
+Dretva: 1, K.O. br: 2 (4/5)
+Dretva: 1, K.O. br: 2 (5/5)
+Dretva: 2, K.O. br: 2 (1/5)
+Dretva: 2, K.O. br: 1 (2/5)
+(itd.)

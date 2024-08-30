@@ -1,0 +1,21 @@
+Dretve
+Zadatak
+
+Napisati program koji stvara M novih dretava (M ovisi o argumentima naredbenoga retka). Svaka dretva ispisuje površinu jednoga jednakostraničnoga mnogokuta, ter nakon jedne sekunde ispisuje opseg istoga mnogokuta na zaslon. Broj i duljina stranica, za svaki mnogokut, navodi se kao argument naredbenoga retka.
+Napomene
+
+Ograničiti program na najviše 5 mnogokuta, tj. 5 novih dretava. Površina i opseg jednakostraničnoga mnogokuta s n stranica duljine a računa se po formulama:
+POVRŠINA=1/4*n*a*a/tg(3.14159265358979/n)
+OPSEG=n*a.
+Primjer ispisa prigodom pokretanja programa
+
+lumilic@barka:~/vj2$ ./b.out 3 1.5 11 2 7 1 16 4.1 
+n=3	a=1.5	P=0.974278579
+n=11	a=2	P=37.46255963
+n=3	a=1.5	O=4.5
+n=7	a=1	P=3.633912444
+n=11	a=2	O=22
+n=16	a=4.1	P=338.0383075
+n=7	a=1	O=7
+n=16	a=4.1	O=65.6
+lumilic@barka:~/vj2$

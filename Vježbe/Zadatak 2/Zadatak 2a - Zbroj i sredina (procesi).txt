@@ -1,0 +1,18 @@
+Procesi
+Zadatak
+
+Napisati program koji pokreće više procesa. Neka postoje dva tipa procesa i neka je M procesa svakoga tipa (M zadati kao argument naredbenoga retka). Svaki proces prvoga tipa treba generirati slučajnih N (može se definirati i fiksno kao 30) brojeva i zapisati ih u svoje polje. Svaki proces drugoga tipa treba izračunati zbroj članova jednoga polja i ispisati ju na zaslon, a nakon jedne sekunde ispisati i aritmetičku sredinu svih članova istoga polja na zaslon. 
+
+Obratiti pozornost da postoji više polja u koja se upisuju brojevi, a ne samo jedno u koje pišu svi procesi. Polja mogu biti organizirana kao jedno jednodimenzionalno polje s podjelom npr. u prvih N elemenata piše prvi proces, u drugih N elemenata piše drugi proces itd. Na isti način prvi proces čita prvih N elemenata, drugi proces čita drugih N elemenata...
+Primjer ispisa prigodom pokretanja programa
+
+lumilic@barka:~/vj2$ ./a.out 4
+polje1 zbroj=76047
+polje2 zbroj=58672
+polje2 aritm_sredina=2095.428571
+polje1 aritm_sredina=2715.964286
+polje3 zbroj=67342
+polje3 aritm_sredina=2405.071429
+polje4 zbroj=73116
+polje4 aritm_sredina=2611.285714
+lumilic@barka:~/vj2$
