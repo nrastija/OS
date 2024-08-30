@@ -1,0 +1,134 @@
+Vježba 1: Prekidi i signali
+Zadatak
+Napisati program koji omogućuje obradbu prekida s više razina/prioriteta (simulira ponašanje sustava opisanoga u 3. poglavlju i to bez sklopa za prihvat prekida).
+
+Struktura prekidne rutine dana je sljedećim pseudokodom:
+
+prekidna_rutina  /* pokreće se pojavkom prekida uz zabranu daljih prekida */ {
+   ispiši_vrijeme_ulaska_u_prekidnu_rutinu();
+
+   odredi uzrok prekida, tj. indeks i;
+   OZNAKA_ČEKANJA[i] = 1;
+
+   ponavljaj {
+      /* odredi prekid najvećega prioriteta koji čeka obradbu */
+      x = 0;
+      za (j = TEKUĆI_PRIORITET + 1 do N) čini {
+         ako (OZNAKA_ČEKANJA[j] <> 0) tada {
+            x = j;
+         }
+      }
+
+      /* ako postoji prekid koji čeka i prioritetniji je od trenutačnoga posla, idi u obradbu */
+      ako (x > 0) tada {
+         OZNAKA_ČEKANJA[x] = 0;
+         PRIORITET[x] = TEKUĆI_PRIORITET;
+         TEKUĆI_PRIORITET = x;
+         omogući prekidanje;
+         obradba_prekida(x);
+         zabrani prekidanje;
+         TEKUĆI_PRIORITET = PRIORITET[x];
+      }
+
+   } dok (x > 0);
+
+} /* povratkom se automatski dopuštaju prekidi (signali) koji su uzrokovali poziv ove f-je */
+
+UNIX ne dopušta pojedinomu korisniku izravnu porabu prekida procesora. Stoga prekide treba simulirati rabeći signale koje jezgra operacijskoga sustava šalje procesima.
+UPUTA
+
+Sklopovski prekid u jednoj razini simulira se pritiskom na tipku Ctrl+C, čim operacijski sustav programu šalje signal SIGINT. Nakon toga operacijski sustav prekida izvođenje programa, zabranjuje dalje prekidanje i zove korisničku funkciju za obradbu signala koja u ovom zadatku simulira prekidnu rutinu.
+
+Korisnička funkcija za prihvat signala mora biti funkcija s jednim cjelobrojnim parametrom (koji se može zanemariti) i mora biti najavljena u glavnom programu naredbom:
+
+sigset(SIGINT, prekidna_rutina);
+
+Na početku prekidne rutine mora se nalaziti naredba koja će od korisnika zaiskati indeks i, što je jednakovrijedno postupku određivanja uzroka prekida. Obradba prekida ne mora ništa korisno činiti, nego samo treba trajati neko vrijeme. Svake sekunde obradbe prekida, kao i rada glavnoga programa, ispisati što se čini.
+
+Npr. ispis može izgledati:
+
+Poceo osnovni program
+Glavni program 1/10
+Glavni program 2/10
+Glavni program 3/10
+Glavni program 4/10
+^C
+Prekidna rutina pozvana u: Thu Aug 27 14:03:09 2023
+
+Upisi razinu prekida: 3<enter>
+
+Poceo obradbu prekida 3
+Obradba prekida 3: 1/5
+Obradba prekida 3: 2/5
+^C
+Prekidna rutina pozvana u: Thu Aug 27 14:03:30 2023
+
+Upisi razinu prekida: 5<enter>
+
+Poceo obradbu prekida 5
+Obradba prekida 5: 1/5
+Obradba prekida 5: 2/5
+Obradba prekida 5: 3/5
+Obradba prekida 5: 4/5
+Obradba prekida 5: 5/5
+Zavrsio obradbu prekida 5
+
+Obradba prekida 3: 3/5
+Obradba prekida 3: 4/5
+Obradba prekida 3: 5/5
+Zavrsio obradbu prekida 3
+
+Glavni program 5/10
+Glavni program 6/10
+...
+Glavni program 9/10
+Glavni program 10/10
+Zavrsio osnovni program
+
+Za ispis vremena vidjeti primjerice  man ctime.
+
+Kostur rješidbe može biti:
+
+#include <stdio.h>
+#include <signal.h>
+#include <time.h>
+
+#define N 8    /* broj razina prekida */
+
+int OZNAKA_CEKANJA[N];
+int PRIORITET[N];
+int TEKUCI_PRIORITET;
+
+void obradba_prekida(int j) {
+   printf("Poceo obradbu prekida %d\n", j);
+   /* obradba se simulira trošenjem vremena - 10 s */
+   printf("Zavrsio obradbu prekida %d\n", j);
+}
+
+void prekidna_rutina(int sig) {
+   int i;
+   time_t t;
+
+   time(&t);
+   printf("Prekidna rutina pozvana u: %s", ctime(&t));
+
+   printf("Upisi razinu prekida: ");
+   scanf("%d", &i);
+                ...
+}
+
+int main() {
+   sigset(SIGINT, prekidna_rutina);
+
+   printf("Poceo osnovni program\n");
+   /* troši vrijeme da se ima što prekinuti - 10 s */
+   printf("Zavrsio osnovni program\n");
+
+   return 0;
+}
+
+NAPOMENA: Katkad signal SIGALRM može na nekim arhitekturama uzrokovati teškoće (po gotovo dok funkcija scanf čita broj s tipkovnice). Zbog toga se preporučuje postupak utvrđivanja prioriteta prekida zaštititi funkcijama sighold() i sigrelse() za signal SIGALRM.
+
+Zabrana prihvata signala (npr. za signal SIGINT) simulira se naredbom: sighold(SIGINT);
+
+Omogućivanje prihvata signala simulira se naredbom: sigrelse(SIGINT);
